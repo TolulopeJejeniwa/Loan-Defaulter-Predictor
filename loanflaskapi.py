@@ -1,10 +1,34 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
-import pandas as pd
+from sklearn.preprocessing import LabelEncoder
 
+# Initialize Flask application
+app = Flask(__name__)
 
-def return_prediction(model, sample_json):
+# Load the model
+model = joblib.load("loan_default_model.pkl")
+scaler = joblib.load("loanscaler.pkl")
+
+# Pre-fitted LabelEncoders for categorical variables
+le_education = LabelEncoder()
+le_employment = LabelEncoder()
+le_marital = LabelEncoder()
+le_mortgage = LabelEncoder()
+le_dependents = LabelEncoder()
+le_purpose = LabelEncoder()
+le_cosigner = LabelEncoder()
+
+# Fit the LabelEncoders with the known categories
+le_education.fit(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'])
+le_employment.fit(['Full-time', 'Part-time', 'Unemployed', 'Self-employed'])
+le_marital.fit(['Single', 'Married', 'Divorced'])
+le_mortgage.fit(['Yes', 'No'])
+le_dependents.fit(['Yes', 'No'])
+le_purpose.fit(['Auto', 'Business', 'Education', 'Home', 'Other'])
+le_cosigner.fit(['Yes', 'No'])
+
+def return_prediction(model, scaler, sample_json):
     # Extract data from json
     data = [
         sample_json["Age"],
@@ -25,25 +49,36 @@ def return_prediction(model, sample_json):
         sample_json["HasCoSigner"]
     ]
 
+    # Encode categorical features using the pre-fitted LabelEncoders
+    data[9] = le_education.transform([data[9]])[0]
+    data[10] = le_employment.transform([data[10]])[0]
+    data[11] = le_marital.transform([data[11]])[0]
+    data[12] = le_mortgage.transform([data[12]])[0]
+    data[13] = le_dependents.transform([data[13]])[0]
+    data[14] = le_purpose.transform([data[14]])[0]
+    data[15] = le_cosigner.transform([data[15]])[0]
+
     data = np.array(data).reshape(1, -1)
-    prediction = model.predict(data)
+    
+    # Scale numerical features
+    scaled_data = scaler.transform(data[:, :9])
+
+    # Combine scaled numerical features and encoded categorical features
+    final_data = np.concatenate([scaled_data, data[:, 9:]], axis=1)
+
+    # Make predictions
+    prediction = model.predict(final_data)
 
     return int(prediction[0])
-
-# Initialize Flask application
-app = Flask(__name__)
 
 @app.route("/")
 def index():
     return "<h1>Loan Default Prediction App</h1>"
 
-# Load the model
-model = joblib.load("loan_default_model.pkl")
-
 @app.route('/predict', methods=['POST'])
 def predict():
     content = request.json
-    result = return_prediction(model, content)
+    result = return_prediction(model, scaler, content)
     return jsonify({'Default': result})
 
 if __name__ == '__main__':
