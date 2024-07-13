@@ -3,11 +3,11 @@ import joblib
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-# Load the trained model and scaler
+# Loading the trained model and scaler
 model = joblib.load('loanmodel.pkl')
 scaler = joblib.load('loanscaler.pkl')
 
-# Pre-fitted LabelEncoders for categorical variables
+# Pre-fitting LabelEncoders for categorical variables
 le_education = LabelEncoder()
 le_employment = LabelEncoder()
 le_marital = LabelEncoder()
@@ -16,7 +16,7 @@ le_dependents = LabelEncoder()
 le_purpose = LabelEncoder()
 le_cosigner = LabelEncoder()
 
-# Fit the LabelEncoders with the known categories
+# Fitting the LabelEncoders with the known categories
 le_education.fit(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'])
 le_employment.fit(['Full-time', 'Part-time', 'Self-employed', 'Unemployed'])
 le_marital.fit(['Single', 'Married', 'Divorced'])
@@ -25,15 +25,15 @@ le_dependents.fit(['Yes', 'No'])
 le_purpose.fit(['Auto', 'Business', 'Education', 'Home', 'Other'])
 le_cosigner.fit(['Yes', 'No'])
 
-# Define the Streamlit app
+# Defining the Streamlit app
 def main():
-    # Set the title of the app
+    # Setting the title of the app
     st.title('Loan Prediction App')
 
-    # Add an image
+    # Adding an image
     st.image('loanimage.jpeg', use_column_width=True)
 
-    # Add a brief description
+    # Adding a brief description
     st.write('Enter the details below to get loan prediction')
 
     # Generating two columns
@@ -69,25 +69,25 @@ def main():
     loan_purpose = le_purpose.transform([loan_purpose])[0]
     has_co_signer = le_cosigner.transform([has_co_signer])[0]
 
-    # Create a button to make predictions
+    # Creating a button to make predictions
     if st.button('Predict'):
-        # Combine input data into a numpy array
+        # Combining input data into a numpy array
         data_array = np.array([[age, income, loan_amount, credit_score, months_employed, num_credit_lines,
                                 interest_rate, loan_term, dti_ratio, education, employment_type, marital_status,
                                 has_mortgage, has_dependents, loan_purpose, has_co_signer]])
 
-        # Scale numerical features
+        # Scaling numerical features
         scaled_data = scaler.transform(data_array[:, :9])
 
-        # Combine scaled numerical features and encoded categorical features
+        # Combining scaled numerical features and encoded categorical features
         final_data = np.concatenate([scaled_data, data_array[:, 9:]], axis=1)
 
-        # Make predictions
+        # Making predictions
         prediction = model.predict(final_data)
 
-        # Display prediction
+        # Displaying prediction
         st.write(f'Prediction: {"Loan Approved" if prediction[0] == 1 else "Loan Not Approved"}')
 
-# Run the Streamlit app
+# Running the Streamlit app
 if __name__ == '__main__':
     main()

@@ -6,11 +6,11 @@ from sklearn.preprocessing import LabelEncoder
 # Initialize Flask application
 app = Flask(__name__)
 
-# Load the model
-model = joblib.load("loan_default_model.pkl")
+# Load the model and scaler
+model = joblib.load("loanmodel.pkl")
 scaler = joblib.load("loanscaler.pkl")
 
-# Pre-fitted LabelEncoders for categorical variables
+# Create LabelEncoders for categorical variables
 le_education = LabelEncoder()
 le_employment = LabelEncoder()
 le_marital = LabelEncoder()
@@ -19,7 +19,7 @@ le_dependents = LabelEncoder()
 le_purpose = LabelEncoder()
 le_cosigner = LabelEncoder()
 
-# Fit the LabelEncoders with the known categories
+# Fit the LabelEncoders with known categories
 le_education.fit(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'])
 le_employment.fit(['Full-time', 'Part-time', 'Unemployed', 'Self-employed'])
 le_marital.fit(['Single', 'Married', 'Divorced'])
@@ -29,7 +29,7 @@ le_purpose.fit(['Auto', 'Business', 'Education', 'Home', 'Other'])
 le_cosigner.fit(['Yes', 'No'])
 
 def return_prediction(model, scaler, sample_json):
-    # Extract data from json
+    # Extract data from JSON
     data = [
         sample_json["Age"],
         sample_json["Income"],
@@ -49,7 +49,7 @@ def return_prediction(model, scaler, sample_json):
         sample_json["HasCoSigner"]
     ]
 
-    # Encode categorical features using the pre-fitted LabelEncoders
+    # Encode categorical features
     data[9] = le_education.transform([data[9]])[0]
     data[10] = le_employment.transform([data[10]])[0]
     data[11] = le_marital.transform([data[11]])[0]
@@ -78,8 +78,11 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     content = request.json
-    result = return_prediction(model, scaler, content)
-    return jsonify({'Default': result})
+    try:
+        result = return_prediction(model, scaler, content)
+        return jsonify({'Default': result})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
-if __name__ == '__main__':
+if __name__ == '__main__':p
     app.run(debug=True)
