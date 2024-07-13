@@ -86,7 +86,7 @@ def main():
         prediction = model.predict(final_data)
 
         # Displaying prediction
-        st.write(f'Prediction: {"Loan Approved" if prediction[0] == 1 else "Loan Not Approved"}')
+        st.write(f'Prediction: {"Will Default" if prediction[0] == 1 else "Will Not Default"}')
 
 # Running the Streamlit app
 if __name__ == '__main__':
