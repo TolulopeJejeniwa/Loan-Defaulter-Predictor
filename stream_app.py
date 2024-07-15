@@ -53,7 +53,7 @@ def main():
     with col2:
         dti_ratio = st.slider('DTI Ratio', 0.0, 1.0, 0.5)
         education = st.selectbox('Education', ['High School', 'Bachelor\'s', 'Master\'s', 'PhD'])
-        employment_type = st.selectbox('Employment Type', ['Full-time', 'Part-Time', 'Self-employed', 'Unemployed'])
+        employment_type = st.selectbox('Employment Type', ['Full-time', 'Part-time', 'Self-employed', 'Unemployed'])
         marital_status = st.selectbox('Marital Status', ['Single', 'Married', 'Divorced'])
         has_mortgage = st.selectbox('Has Mortgage', ['Yes', 'No'])
         has_dependents = st.selectbox('Has Dependents', ['Yes', 'No'])
