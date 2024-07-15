@@ -48,7 +48,7 @@ def main():
         months_employed = st.number_input('Months Employed', 0, 150, 36)
         num_credit_lines = st.number_input('Number of Credit Lines', 0, 20, 5)
         interest_rate = st.number_input('Interest Rate', 0.0, 30.0, 10.0)
-        loan_term = st.number_input('Loan Term (years)', 1, 80, 20)
+        loan_term = st.number_input('Loan Term (months)', 1, 80, 20)
     
     with col2:
         dti_ratio = st.slider('DTI Ratio', 0.0, 1.0, 0.5)
