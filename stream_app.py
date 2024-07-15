@@ -28,13 +28,13 @@ le_cosigner.fit(['Yes', 'No'])
 # Defining the Streamlit app
 def main():
     # Setting the title of the app
-    st.title('Loan Prediction App')
+    st.title('Loan Defaulter Prediction App')
 
     # Adding an image
     st.image('loanimage.jpeg', use_column_width=True)
 
     # Adding a brief description
-    st.write('Enter the details below to get loan prediction')
+    st.write('Enter the applicant details below, to get if an applicant will default in paying back obtained loan')
 
     # Generating two columns
     col1, col2 = st.columns(2)
@@ -47,7 +47,7 @@ def main():
         credit_score = st.number_input('Credit Score', 300, 950, 600)
         months_employed = st.number_input('Months Employed', 0, 150, 36)
         num_credit_lines = st.number_input('Number of Credit Lines', 0, 20, 5)
-        interest_rate = st.slider('Interest Rate', 0.0, 30.0, 10.0)
+        interest_rate = st.number_input('Interest Rate', 0.0, 30.0, 10.0)
         loan_term = st.number_input('Loan Term (years)', 1, 80, 20)
     
     with col2:
