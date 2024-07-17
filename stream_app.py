@@ -87,7 +87,8 @@ def main():
 
         # Displaying prediction
         st.write(f'Prediction: {"Will Default" if prediction[0] == 1 else "Will Not Default"}')
-
+        st.write(f'Probability of Default: {probability[0][1]:.2f}')
+        
 # Running the Streamlit app
 if __name__ == '__main__':
     main()
