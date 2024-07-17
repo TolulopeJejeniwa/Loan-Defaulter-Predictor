@@ -84,11 +84,17 @@ def main():
 
         # Making predictions
         prediction = model.predict(final_data)
-
+        probability = model.predict_proba(final_data)
+        
         # Displaying prediction
         st.write(f'Prediction: {"Will Default" if prediction[0] == 1 else "Will Not Default"}')
-        st.write(f'Probability of Default: {probability[0][1]:.2f}')
-        
+
+        # Print the probability array for debugging
+        st.write(f'Probability array: {probability}')
+
+        # Displaying the probability of default
+        st.write(f'Probability of Default: {probability[0][1]:.2f}' if prediction[0] == 1 else f'Probability of Default: {probability[0][0]:.2f}')
+
 # Running the Streamlit app
 if __name__ == '__main__':
     main()
