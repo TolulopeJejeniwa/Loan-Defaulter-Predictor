@@ -91,7 +91,7 @@ def main():
 
         # Displaying the probability of default if prediction is 1
         if prediction[0] == 1:
-            st.write(f'Probability of Defaulting: {probability[0][1] * 100:.2f}%')
+            st.write(f'Probability of Defaulting is: {probability[0][1] * 100:.2f}%')
 
 # Running the Streamlit app
 if __name__ == '__main__':
