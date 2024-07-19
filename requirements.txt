@@ -1,7 +1,7 @@
-streamlit
+streamlit==1.35.0
 joblib
 pandas
-scikit-learn
+scikit-learn==1.4.2
 numpy
 Flask
-gunicorn
+gunicorn22.0.0
