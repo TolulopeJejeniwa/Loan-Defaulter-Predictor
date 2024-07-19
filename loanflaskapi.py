@@ -79,6 +79,17 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     content = request.json
+    required_fields = [
+        "Age", "Income", "LoanAmount", "CreditScore", "MonthsEmployed",
+        "NumCreditLines", "InterestRate", "LoanTerm", "DTIRatio", "Education",
+        "EmploymentType", "MaritalStatus", "HasMortgage", "HasDependents",
+        "LoanPurpose", "HasCoSigner"
+    ]
+    
+    for field in required_fields:
+        if field not in content:
+            return jsonify({'error': f'Missing field: {field}'}), 400
+
     try:
         result, probability = return_prediction(model, scaler, content)
         if result == 1:
