@@ -3,14 +3,14 @@ import joblib
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
-# Initialize Flask application
+# Initializing Flask Application:
 app = Flask(__name__)
 
-# Load the model and scaler
+# Loading the model and scaler:
 model = joblib.load("loanmodel.pkl")
 scaler = joblib.load("loanscaler.pkl")
 
-# Create LabelEncoders for categorical variables
+# Creating LabelEncoders for Categorical Variables:
 le_education = LabelEncoder()
 le_employment = LabelEncoder()
 le_marital = LabelEncoder()
@@ -19,7 +19,7 @@ le_dependents = LabelEncoder()
 le_purpose = LabelEncoder()
 le_cosigner = LabelEncoder()
 
-# Fit the LabelEncoders with known categories
+# Fitting the LabelEncoders with Known Categories:
 le_education.fit(['High School', 'Bachelor\'s', 'Master\'s', 'PhD'])
 le_employment.fit(['Full-time', 'Part-time', 'Unemployed', 'Self-employed'])
 le_marital.fit(['Single', 'Married', 'Divorced'])
@@ -29,7 +29,7 @@ le_purpose.fit(['Auto', 'Business', 'Education', 'Home', 'Other'])
 le_cosigner.fit(['Yes', 'No'])
 
 def return_prediction(model, scaler, sample_json):
-    # Extract data from JSON
+    # Extracting data from JSON:
     data = [
         sample_json["Age"],
         sample_json["Income"],
@@ -49,7 +49,7 @@ def return_prediction(model, scaler, sample_json):
         sample_json["HasCoSigner"]
     ]
 
-    # Encode categorical features
+    # Encoding Categorical Features:
     data[9] = le_education.transform([data[9]])[0]
     data[10] = le_employment.transform([data[10]])[0]
     data[11] = le_marital.transform([data[11]])[0]
@@ -60,16 +60,17 @@ def return_prediction(model, scaler, sample_json):
 
     data = np.array(data).reshape(1, -1)
     
-    # Scale numerical features
+    # Scaling Numerical Features:
     scaled_data = scaler.transform(data[:, :9])
 
-    # Combine scaled numerical features and encoded categorical features
+    # Combining Scaled Numerical Features and Encoded Categorical Features:
     final_data = np.concatenate([scaled_data, data[:, 9:]], axis=1)
 
-    # Make predictions
+    # Making Predictions:
     prediction = model.predict(final_data)
+    probability = model.predict_proba(final_data)[0][1]
 
-    return int(prediction[0])
+    return int(prediction[0]), probability
 
 @app.route("/")
 def index():
@@ -79,10 +80,17 @@ def index():
 def predict():
     content = request.json
     try:
-        result = return_prediction(model, scaler, content)
-        return jsonify({'Default': result})
+        result, probability = return_prediction(model, scaler, content)
+        if result == 1:
+            response = {
+                'Prediction': 'Will default',
+                'Probability': f"The probability of defaulting is: {probability * 100:.2f}%"
+            }
+        else:
+            response = {'Prediction': 'Will not default'}
+        return jsonify(response)
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-if __name__ == '__main__':p
+if __name__ == '__main__':
     app.run(debug=True)
